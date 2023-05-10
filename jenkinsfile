@@ -1,1 +1,31 @@
+pipeline {
+    agent any
 
+    stages {
+        stage('SCM Checkout') {
+            steps {
+                echo 'SCM Clone'
+                git credentialsId: 'GitHub_Key', url: 'https://github.com/rranjith406/hello-world-war.git'
+                //git branch: 'stagging', url: 'https://github.com/rranjith406/hello-world-war.git'
+            }
+        }
+        stage('Build Stage') {
+            steps {
+                echo 'Build using Maven Goals'
+                sh "mvn clean install"
+            }
+        }
+        stage('Test stage') {
+            steps {
+                echo 'Test using Maven Goals'
+                sh 'mvn test'
+            }
+        }
+        stage('Deploy stsge') {
+            steps {
+                echo 'Deploy to TOmcat server'
+                deploy adapters: [tomcat9(credentialsId: 'Tomcat_ID', path: '', url: 'http://15.206.151.178:8090/')], contextPath: 'HelloWorld_Pipeline', war: '**/*.war'
+            }
+        }
+    }
+}
